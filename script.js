@@ -163,8 +163,8 @@ class Slider {
   showValueInterval() {
     let { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo, slider } = this.HTMLElement;
     slider.addEventListener('input', () => {
-      rangeSliderFrom.value = rangeMin.value;
-      rangeSliderTo.value = rangeMax.value;
+      rangeSliderFrom.value = this.from = rangeMin.value;
+      rangeSliderTo.value = this.to = rangeMax.value;
     })
   }
 
