@@ -71,6 +71,7 @@ class Slider {
   getHTMLElement() {
     return {
       slider: document.querySelector('.range-slider'),
+      sliderPanel: document.querySelector('.slider-panel'),
       sliderProgress: document.querySelector('.range-slider__progress'),
       rangeMin: document.querySelector('[data-range="slider-minus"]'),
       rangeMax: document.querySelector('[data-range="slider-plus"]'),
@@ -93,6 +94,8 @@ class Slider {
     let { rangeMin, rangeMax } = this.HTMLElement;
     rangeMin.min = rangeMax.min = this.min;
     rangeMin.max = rangeMax.max = this.max;
+    rangeMin.value = this.from;
+    rangeMax.value = this.to;
   }
 
   setStepValue() {
@@ -112,8 +115,8 @@ class Slider {
 
   setInterval() {
     let { sliderMin, sliderMax } = this.HTMLElement;
-    sliderMin.value = this.min;
-    sliderMax.value = this.max;
+    sliderMin.min = sliderMax.min = sliderMin.value = this.min;
+    sliderMin.max = sliderMax.max = sliderMax.value = this.max;
   }
 
   changeIndicatorPosition() {
@@ -127,10 +130,19 @@ class Slider {
   }
 
   changeValueByEvent() {
-    let { sliderMin, rangeMin, rangeMax } = this.HTMLElement;
-    sliderMin.addEventListener('input', () => {
-      this.min = sliderMin.value;
+    let { sliderPanel, sliderMin, sliderMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    sliderPanel.addEventListener('change', (event) => {
+      if (event.target.dataset.min == "slider-min") {
+        this.min = sliderMin.value;
+      } else if (event.target.dataset.max == "slider-max") {
+        this.max = sliderMax.value;
+      } else if (event.target.dataset.from == "slider-from") {
+        this.from = rangeSliderFrom.value;
+      } else if (event.target.dataset.to == "slider-to") {
+        this.to = rangeSliderTo.value;
+      }
       this.defaultIndicatorPosition();
+      this.setSliderValueAll();
     })
   }
 
