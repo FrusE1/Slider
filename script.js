@@ -1,49 +1,54 @@
-let sliderRangeElem = `<div class="slider__range range-slider">
-  <div class="range-slider__bar">
-    <div class="range-slider__progress"></div>
+function getTemplateSlider(args) {
+  const [min, max, from, to, step] = args;
+  return `
+  <div class="slider__range range-slider">
+    <div class="range-slider__bar">
+      <div class="range-slider__progress"></div>
+    </div>
+    <div class="range-slider__input">
+      <input type="range" data-type="range" data-range="slider-minus" min="${min}" max="${max}" value="${from}" step="${step}">
+      <input type="range" data-type="range" data-range="slider-plus" min="${min}" max="${max}" value="${to}" step="${step}">
+    </div>
   </div>
-  <div class="range-slider__input">
-    <input type="range" data-type="range" data-range="slider-minus" min="0" max="1000" value="250">
-    <input type="range" data-type="range" data-range="slider-plus" min="0" max="1000" value="750">
+  <div class="slider__panel slider-panel">
+    <div class="slider-panel__step slider-panel__elem">
+      <div class="slider-panel__text">Step</div>
+      <input type="number" data-step="slider-step" min="${min}" max="${max}" value="${step}">
+    </div>
+    <div class="slider-panel__interval_min slider-panel__elem">
+      <div class="slider-panel__text">Min</div>
+      <input type="number" data-interval="slider-interval" data-min="slider-min" min="${min}" max="${max}" value="${min}">
+    </div>
+    <div class="slider-panel__interval_max slider-panel__elem">
+      <div class="slider-panel__text">Max</div>
+      <input type="number" data-interval="slider-interval" data-max="slider-max" min="${min}" max="${max}" value="${max}">
+    </div>
+    <div class="slider-panel__interval_min slider-panel__elem">
+      <div class="slider-panel__text">From</div>
+      <input type="number" data-from="slider-from" min="${min}" max="${max}" value="${from}">
+    </div>
+    <div class="slider-panel__interval_max slider-panel__elem">
+      <div class="slider-panel__text">To</div>
+      <input type="number" data-to="slider-to" min="${min}" max="${max}" value="${to}">
+    </div>
+    <div class="slider-panel__checkbox slider-panel__elem">
+      <label class="slider-panel__text">Vertical
+        <input type="checkbox"></input>
+      </label>
+    </div>
+    <div class="slider-panel__checkbox slider-panel__elem">
+      <label class="slider-panel__text">Tip
+        <input type="checkbox"></input>
+      </label>
+    </div>
+    <div class="slider-panel__checkbox slider-panel__elem">
+      <label class="slider-panel__text">Range
+        <input type="checkbox"></input>
+      </label>
+    </div>
   </div>
-  </div>`;
-let sliderPanelELem = `<div class="slider__panel slider-panel">
-  <div class="slider-panel__step slider-panel__elem">
-    <div class="slider-panel__text">Step</div>
-    <input type="number" data-step="slider-step" min="0" max="1000" value="1">
-  </div>
-  <div class="slider-panel__interval_min slider-panel__elem">
-    <div class="slider-panel__text">Min</div>
-    <input type="number" data-interval="slider-interval" data-min="slider-min" min="0" max="1000" value="0">
-  </div>
-  <div class="slider-panel__interval_max slider-panel__elem">
-    <div class="slider-panel__text">Max</div>
-    <input type="number" data-interval="slider-interval" data-max="slider-max" min="0" max="1000" value="1000">
-  </div>
-  <div class="slider-panel__interval_min slider-panel__elem">
-    <div class="slider-panel__text">From</div>
-    <input type="number" data-from="slider-from" min="0" max="1000" value="250">
-  </div>
-  <div class="slider-panel__interval_max slider-panel__elem">
-    <div class="slider-panel__text">To</div>
-    <input type="number" data-to="slider-to" min="0" max="1000" value="750">
-  </div>
-  <div class="slider-panel__checkbox slider-panel__elem">
-    <label class="slider-panel__text">Vertical
-      <input type="checkbox"></input>
-    </label>
-  </div>
-  <div class="slider-panel__checkbox slider-panel__elem">
-    <label class="slider-panel__text">Tip
-      <input type="checkbox"></input>
-    </label>
-  </div>
-  <div class="slider-panel__checkbox slider-panel__elem">
-    <label class="slider-panel__text">Range
-      <input type="checkbox"></input>
-    </label>
-  </div>
-  </div>`;
+  `
+}
 
 
 class Slider {
@@ -54,9 +59,8 @@ class Slider {
     this.from = options.from;
     this.to = options.to;
     this.step = options.step;
-    this.init();
+    this.#render();
     this.HTMLElement = this.getHTMLElement();
-    this.setSliderValueAll();
     this.changeIndicatorPosition();
     this.defaultIndicatorPosition();
     this.defaultRangePosition();
@@ -64,8 +68,10 @@ class Slider {
     this.changeValueByEvent();
   }
 
-  init() {
-    this.$el.innerHTML = sliderRangeElem + sliderPanelELem;
+  #render() {
+    const items = [this.min, this.max, this.from, this.to, this.step]
+    this.$el.className += ' slider';
+    this.$el.innerHTML = getTemplateSlider(items);
   }
 
   getHTMLElement() {
@@ -83,44 +89,50 @@ class Slider {
     }
   }
 
-  setSliderValueAll() {
-    this.setRangeValue();
-    this.setStepValue();
-    this.setInputRangeValue();
-    this.setInterval();
+  // setSliderValueAll() {
+  //   this.setRangeValue();
+  //   this.setStepValue();
+  //   this.setInputRangeValue();
+  //   this.setInterval();
+  // }
+
+  setValue() {
+    const { rangeMin, rangeMax, sliderMin, sliderMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    this.min = rangeSliderFrom.min = rangeMin.min = rangeMax.min = sliderMin.value;
+    this.max = rangeSliderTo.max = rangeMin.max = rangeMax.max = sliderMax.value;
   }
 
-  setRangeValue() {
-    let { rangeMin, rangeMax } = this.HTMLElement;
-    rangeMin.min = rangeMax.min = this.min;
-    rangeMin.max = rangeMax.max = this.max;
-    rangeMin.value = this.from;
-    rangeMax.value = this.to;
-  }
+  // setRangeValue() {
+  //   const { rangeMin, rangeMax } = this.HTMLElement;
+  //   rangeMin.min = rangeMax.min = this.min;
+  //   rangeMin.max = rangeMax.max = this.max;
+  //   rangeMin.value = this.from;
+  //   rangeMax.value = this.to;
+  // }
 
-  setStepValue() {
-    let { stepSlider } = this.HTMLElement;
-    stepSlider.min = this.min;
-    stepSlider.max = this.max;
-    stepSlider.value = this.step;
-  }
+  // setStepValue() {
+  //   const { stepSlider } = this.HTMLElement;
+  //   stepSlider.min = this.min;
+  //   stepSlider.max = this.max;
+  //   stepSlider.value = this.step;
+  // }
 
-  setInputRangeValue() {
-    let { rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
-    rangeSliderFrom.min = rangeSliderTo.min = this.min;
-    rangeSliderFrom.max = rangeSliderTo.max = this.max;
-    rangeSliderFrom.value = this.from;
-    rangeSliderTo.value = this.to;
-  }
+  // setInputRangeValue() {
+  //   const { rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+  //   rangeSliderFrom.min = rangeSliderTo.min = this.min;
+  //   rangeSliderFrom.max = rangeSliderTo.max = this.max;
+  //   rangeSliderFrom.value = this.from;
+  //   rangeSliderTo.value = this.to;
+  // }
 
-  setInterval() {
-    let { sliderMin, sliderMax } = this.HTMLElement;
-    sliderMin.min = sliderMax.min = sliderMin.value = this.min;
-    sliderMin.max = sliderMax.max = sliderMax.value = this.max;
-  }
+  // setInterval() {
+  //   const { sliderMin, sliderMax } = this.HTMLElement;
+  //   sliderMin.min = sliderMax.min = sliderMin.value = this.min;
+  //   sliderMin.max = sliderMax.max = sliderMax.value = this.max;
+  // }
 
   changeIndicatorPosition() {
-    let { slider, sliderProgress, rangeMin, rangeMax } = this.HTMLElement;
+    const { slider, sliderProgress, rangeMin, rangeMax } = this.HTMLElement;
     slider.addEventListener('input', () => {
       // Вычисление левого положения индикатора
       sliderProgress.style.left = `${((rangeMin.value - this.min) / (this.max - this.min)) * 100}%`;
@@ -130,24 +142,26 @@ class Slider {
   }
 
   changeValueByEvent() {
-    let { sliderPanel, sliderMin, sliderMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    const { sliderPanel, stepSlider, sliderMin, sliderMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
     sliderPanel.addEventListener('change', (event) => {
-      if (event.target.dataset.min == "slider-min") {
+      if (event.target.dataset.min === "slider-min") {
         this.min = sliderMin.value;
-      } else if (event.target.dataset.max == "slider-max") {
+      } else if (event.target.dataset.max === "slider-max") {
         this.max = sliderMax.value;
-      } else if (event.target.dataset.from == "slider-from") {
+      } else if (event.target.dataset.from === "slider-from") {
         this.from = rangeSliderFrom.value;
-      } else if (event.target.dataset.to == "slider-to") {
+      } else if (event.target.dataset.to === "slider-to") {
         this.to = rangeSliderTo.value;
+      } else if (event.target.dataset.step === "slider-step") {
+        this.step = stepSlider.value;
       }
       this.defaultIndicatorPosition();
-      this.setSliderValueAll();
+      this.setValue();
     })
   }
 
   defaultIndicatorPosition() {
-    let { sliderProgress, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    const { sliderProgress, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
     // Вычисление левого положения индикатора
     sliderProgress.style.left = `${((rangeSliderFrom.value - this.min) / (this.max - this.min)) * 100}%`;
     // Вычисление правого положения индикатора
@@ -155,13 +169,13 @@ class Slider {
   }
 
   defaultRangePosition() {
-    let { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    const { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
     rangeMin.value = rangeSliderFrom.value;
     rangeMax.value = rangeSliderTo.value;
   }
 
   showValueInterval() {
-    let { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo, slider } = this.HTMLElement;
+    const { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo, slider } = this.HTMLElement;
     slider.addEventListener('input', () => {
       rangeSliderFrom.value = this.from = rangeMin.value;
       rangeSliderTo.value = this.to = rangeMax.value;
