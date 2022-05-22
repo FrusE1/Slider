@@ -118,15 +118,7 @@ class Slider {
     sliderPanel.addEventListener('change', (event) => {
       const { slider } = event.target.dataset;
 
-      if (slider === "min") {
-        this.setValue();
-      } else if (slider === "max") {
-        this.setValue();
-      } else if (slider === "from") {
-        this.setValue();
-      } else if (slider === "to") {
-        this.setValue();
-      } else if (slider === "step") {
+      if (event.target.dataset.slider === slider) {
         this.setValue();
       }
 
