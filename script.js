@@ -97,7 +97,7 @@ class Slider {
 
     this.min = rangeMin.min = rangeMax.min = sliderMin.value;
     this.max = rangeMin.max = rangeMax.max = sliderMax.value;
-    this.step = rangeMin.step = rangeMax.step = stepSlider.value;
+    this.step = rangeMin.step = rangeMax.step = Math.abs(stepSlider.value);
     if (!this.isFromLargeMin()) {
       this.from = rangeSliderFrom.value = this.min;
     } else {
@@ -107,6 +107,11 @@ class Slider {
       this.to = rangeSliderTo.value = this.max;
     } else {
       this.to = rangeSliderTo.value;
+    }
+    if (this.isStepLargeMax()) {
+      stepSlider.value = Math.abs(this.max);
+    } else {
+      stepSlider.value = Math.abs(stepSlider.value);
     }
     rangeMin.value = rangeSliderFrom.value;
     rangeMax.value = rangeSliderTo.value;
@@ -120,6 +125,11 @@ class Slider {
   isToLargeMax() {
     const { rangeSliderTo } = this.HTMLElement;
     return +rangeSliderTo.value > +this.max;
+  }
+
+  isStepLargeMax() {
+    const { stepSlider } = this.HTMLElement;
+    return Math.abs(stepSlider.value) > Math.abs(this.max);
   }
 
   changeIndicatorPosition() {
