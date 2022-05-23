@@ -63,13 +63,16 @@ class Slider {
     this.HTMLElement = this.getHTMLElement();
     this.changeIndicatorPosition();
     this.defaultIndicatorPosition();
-    this.defaultRangePosition();
     this.showValueInterval();
     this.changeValueByEvent();
   }
 
+  itemsFunc() {
+    return [this.min, this.max, this.from, this.to, this.step]
+  }
+
   #render() {
-    const items = [this.min, this.max, this.from, this.to, this.step]
+    const items = [this.min, this.max, this.from, this.to, this.step];
     this.$el.className += ' slider';
     this.$el.innerHTML = getTemplateSlider(items);
   }
@@ -95,34 +98,50 @@ class Slider {
     this.min = rangeMin.min = rangeMax.min = sliderMin.value;
     this.max = rangeMin.max = rangeMax.max = sliderMax.value;
     this.step = rangeMin.step = rangeMax.step = stepSlider.value;
-    this.from = rangeSliderFrom.value;
-    this.to = rangeSliderTo.value;
+    if (!this.isFromLargeMin()) {
+      this.from = rangeSliderFrom.value = this.min;
+    } else {
+      this.from = rangeSliderFrom.value;
+    }
+    if (this.isToLargeMax()) {
+      this.to = rangeSliderTo.value = this.max;
+    } else {
+      this.to = rangeSliderTo.value;
+    }
     rangeMin.value = rangeSliderFrom.value;
     rangeMax.value = rangeSliderTo.value;
+  }
+
+  isFromLargeMin() {
+    const { rangeSliderFrom } = this.HTMLElement;
+    return +rangeSliderFrom.value > +this.min;
+  }
+
+  isToLargeMax() {
+    const { rangeSliderTo } = this.HTMLElement;
+    return +rangeSliderTo.value > +this.max;
   }
 
   changeIndicatorPosition() {
     const { slider, sliderProgress, rangeMin, rangeMax } = this.HTMLElement;
 
     slider.addEventListener('input', () => {
-      // Вычисление левого положения индикатора
       sliderProgress.style.left = `${((rangeMin.value - this.min) / (this.max - this.min)) * 100}%`;
-      // Вычисление правого положения индикатора
       sliderProgress.style.right = `${100 - (((rangeMax.value - this.min) / (this.max - this.min)) * 100)}%`;
     })
   }
 
   changeValueByEvent() {
-    const { sliderPanel, stepSlider, sliderMin, sliderMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    const { sliderPanel } = this.HTMLElement;
 
     sliderPanel.addEventListener('change', (event) => {
       const { slider } = event.target.dataset;
 
       if (event.target.dataset.slider === slider) {
         this.setValue();
+        this.defaultIndicatorPosition();
       }
 
-      this.defaultIndicatorPosition();
     })
   }
 
@@ -131,13 +150,6 @@ class Slider {
 
     sliderProgress.style.left = `${((rangeSliderFrom.value - this.min) / (this.max - this.min)) * 100}%`;
     sliderProgress.style.right = `${100 - (((rangeSliderTo.value - this.min) / (this.max - this.min)) * 100)}%`;
-  }
-
-  defaultRangePosition() {
-    const { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
-
-    rangeMin.value = rangeSliderFrom.value;
-    rangeMax.value = rangeSliderTo.value;
   }
 
   showValueInterval() {
