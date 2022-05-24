@@ -67,10 +67,6 @@ class Slider {
     this.changeValueByEvent();
   }
 
-  itemsFunc() {
-    return [this.min, this.max, this.from, this.to, this.step]
-  }
-
   #render() {
     const items = [this.min, this.max, this.from, this.to, this.step];
     this.$el.className += ' slider';
@@ -98,35 +94,36 @@ class Slider {
     this.min = rangeMin.min = rangeMax.min = sliderMin.value;
     this.max = rangeMin.max = rangeMax.max = sliderMax.value;
     this.step = rangeMin.step = rangeMax.step = Math.abs(stepSlider.value);
+    rangeMin.value = rangeSliderFrom.value;
+    rangeMax.value = rangeSliderTo.value;
+
     if (!this.isFromLargeMin()) {
       this.from = rangeSliderFrom.value = this.min;
     } else {
       this.from = rangeSliderFrom.value;
     }
+
     if (this.isToLargeMax()) {
       this.to = rangeSliderTo.value = this.max;
     } else {
       this.to = rangeSliderTo.value;
     }
+
     if (this.isStepLargeMax()) {
       stepSlider.value = Math.abs(this.max);
     } else {
       stepSlider.value = Math.abs(stepSlider.value);
     }
-    rangeMin.value = rangeSliderFrom.value;
-    rangeMax.value = rangeSliderTo.value;
   }
 
   isFromLargeMin() {
     const { rangeSliderFrom } = this.HTMLElement;
     return +rangeSliderFrom.value > +this.min;
   }
-
   isToLargeMax() {
     const { rangeSliderTo } = this.HTMLElement;
     return +rangeSliderTo.value > +this.max;
   }
-
   isStepLargeMax() {
     const { stepSlider } = this.HTMLElement;
     return Math.abs(stepSlider.value) > Math.abs(this.max);
@@ -135,10 +132,27 @@ class Slider {
   changeIndicatorPosition() {
     const { slider, sliderProgress, rangeMin, rangeMax } = this.HTMLElement;
 
-    slider.addEventListener('input', () => {
+    slider.addEventListener('input', (event) => {
+      this.setMinMaxValue(event);
       sliderProgress.style.left = `${((rangeMin.value - this.min) / (this.max - this.min)) * 100}%`;
       sliderProgress.style.right = `${100 - (((rangeMax.value - this.min) / (this.max - this.min)) * 100)}%`;
     })
+  }
+
+  setMinMaxValue(event) {
+    const { rangeMin, rangeMax } = this.HTMLElement;
+    if (this.isBig()) {
+      if (event.target.dataset.slider == "minus") {
+        rangeMin.value = +rangeMax.value - (this.max * 0.05);
+      } else if (event.target.dataset.slider == "plus") {
+        rangeMax.value = +rangeMin.value + (this.max * 0.05);
+      }
+    }
+  }
+
+  isBig() {
+    const { rangeMin, rangeMax } = this.HTMLElement;
+    return ((rangeMax.value - rangeMin.value) / (this.max - this.min)) * 100 < 5;
   }
 
   changeValueByEvent() {
