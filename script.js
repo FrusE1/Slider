@@ -3,7 +3,7 @@ function getTemplateSlider(args) {
   return `
   <div class="slider__range range-slider">
     <div class="range-slider__bar">
-      <div class="range-slider__progress"></div>
+      <div class="range-slider__indicator"></div>
     </div>
     <div class="range-slider__input">
       <input type="range" data-type="range" data-slider="minus" min="${min}" max="${max}" value="${from}" step="${step}">
@@ -63,7 +63,7 @@ class Slider {
     this.HTMLElement = this.getHTMLElement();
     this.changeIndicatorPosition();
     this.defaultIndicatorPosition();
-    this.showValueInterval();
+    this.showValueIndicatorValue();
     this.changeValueByEvent();
   }
 
@@ -76,89 +76,89 @@ class Slider {
   getHTMLElement() {
     return {
       slider: document.querySelector('.range-slider'),
-      sliderPanel: document.querySelector('.slider-panel'),
-      sliderProgress: document.querySelector('.range-slider__progress'),
-      rangeMin: document.querySelector('[data-slider="minus"]'),
-      rangeMax: document.querySelector('[data-slider="plus"]'),
-      stepSlider: document.querySelector('[data-slider="step"]'),
-      sliderMin: document.querySelector('[data-slider="min"]'),
-      sliderMax: document.querySelector('[data-slider="max"]'),
-      rangeSliderFrom: document.querySelector('[data-slider="from"]'),
-      rangeSliderTo: document.querySelector('[data-slider="to"]'),
+      panel: document.querySelector('.slider-panel'),
+      indicatorBody: document.querySelector('.range-slider__indicator'),
+      indicatorMin: document.querySelector('[data-slider="minus"]'),
+      indicatorMax: document.querySelector('[data-slider="plus"]'),
+      step: document.querySelector('[data-slider="step"]'),
+      min: document.querySelector('[data-slider="min"]'),
+      max: document.querySelector('[data-slider="max"]'),
+      from: document.querySelector('[data-slider="from"]'),
+      to: document.querySelector('[data-slider="to"]'),
     }
   }
 
   setValue() {
-    const { rangeMin, rangeMax, stepSlider, sliderMin, sliderMax, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    const { indicatorMin, indicatorMax, step, min, max, from, to } = this.HTMLElement;
 
-    this.min = rangeMin.min = rangeMax.min = sliderMin.value;
-    this.max = rangeMin.max = rangeMax.max = sliderMax.value;
-    this.step = rangeMin.step = rangeMax.step = Math.abs(stepSlider.value);
-    rangeMin.value = rangeSliderFrom.value;
-    rangeMax.value = rangeSliderTo.value;
+    this.min = indicatorMin.min = indicatorMax.min = min.value;
+    this.max = indicatorMin.max = indicatorMax.max = max.value;
+    this.step = indicatorMin.step = indicatorMax.step = Math.abs(step.value);
+    indicatorMin.value = from.value;
+    indicatorMax.value = to.value;
 
-    if (!this.isFromLargeMin()) {
-      this.from = rangeSliderFrom.value = this.min;
+    if (!this.isFromValueLargeMin()) {
+      this.from = from.value = this.min;
     } else {
-      this.from = rangeSliderFrom.value;
+      this.from = from.value;
     }
 
-    if (this.isToLargeMax()) {
-      this.to = rangeSliderTo.value = this.max;
+    if (this.isToValueLargeMax()) {
+      this.to = to.value = this.max;
     } else {
-      this.to = rangeSliderTo.value;
+      this.to = to.value;
     }
 
     if (this.isStepLargeMax()) {
-      stepSlider.value = Math.abs(this.max);
+      step.value = Math.abs(this.max);
     } else {
-      stepSlider.value = Math.abs(stepSlider.value);
+      step.value = Math.abs(step.value);
     }
   }
 
-  isFromLargeMin() {
-    const { rangeSliderFrom } = this.HTMLElement;
-    return +rangeSliderFrom.value > +this.min;
+  isFromValueLargeMin() {
+    const { from } = this.HTMLElement;
+    return +from.value > +this.min;
   }
-  isToLargeMax() {
-    const { rangeSliderTo } = this.HTMLElement;
-    return +rangeSliderTo.value > +this.max;
+  isToValueLargeMax() {
+    const { to } = this.HTMLElement;
+    return +to.value > +this.max;
   }
   isStepLargeMax() {
-    const { stepSlider } = this.HTMLElement;
-    return Math.abs(stepSlider.value) > Math.abs(this.max);
+    const { step } = this.HTMLElement;
+    return Math.abs(step.value) > Math.abs(this.max);
   }
 
   changeIndicatorPosition() {
-    const { slider, sliderProgress, rangeMin, rangeMax } = this.HTMLElement;
+    const { slider, indicatorBody, indicatorMin, indicatorMax } = this.HTMLElement;
 
     slider.addEventListener('input', (event) => {
-      this.setMinMaxValue(event);
-      sliderProgress.style.left = `${((rangeMin.value - this.min) / (this.max - this.min)) * 100}%`;
-      sliderProgress.style.right = `${100 - (((rangeMax.value - this.min) / (this.max - this.min)) * 100)}%`;
+      this.indicatorGap(event);
+      indicatorBody.style.left = `${((indicatorMin.value - this.min) / (this.max - this.min)) * 100}%`;
+      indicatorBody.style.right = `${100 - (((indicatorMax.value - this.min) / (this.max - this.min)) * 100)}%`;
     })
   }
 
-  setMinMaxValue(event) {
-    const { rangeMin, rangeMax } = this.HTMLElement;
-    if (this.isBig()) {
+  indicatorGap(event) {
+    const { indicatorMin, indicatorMax } = this.HTMLElement;
+    if (this.isIndicatorGap()) {
       if (event.target.dataset.slider == "minus") {
-        rangeMin.value = +rangeMax.value - (this.max * 0.05);
+        indicatorMin.value = +indicatorMax.value - (this.max * 0.05);
       } else if (event.target.dataset.slider == "plus") {
-        rangeMax.value = +rangeMin.value + (this.max * 0.05);
+        indicatorMax.value = +indicatorMin.value + (this.max * 0.05);
       }
     }
   }
 
-  isBig() {
-    const { rangeMin, rangeMax } = this.HTMLElement;
-    return ((rangeMax.value - rangeMin.value) / (this.max - this.min)) * 100 < 5;
+  isIndicatorGap() {
+    const { indicatorMin, indicatorMax } = this.HTMLElement;
+    return ((indicatorMax.value - indicatorMin.value) / (this.max - this.min)) * 100 < 5;
   }
 
   changeValueByEvent() {
-    const { sliderPanel } = this.HTMLElement;
+    const { panel } = this.HTMLElement;
 
-    sliderPanel.addEventListener('change', (event) => {
+    panel.addEventListener('change', (event) => {
       const { slider } = event.target.dataset;
 
       if (event.target.dataset.slider === slider) {
@@ -170,18 +170,18 @@ class Slider {
   }
 
   defaultIndicatorPosition() {
-    const { sliderProgress, rangeSliderFrom, rangeSliderTo } = this.HTMLElement;
+    const { indicatorBody, from, to } = this.HTMLElement;
 
-    sliderProgress.style.left = `${((rangeSliderFrom.value - this.min) / (this.max - this.min)) * 100}%`;
-    sliderProgress.style.right = `${100 - (((rangeSliderTo.value - this.min) / (this.max - this.min)) * 100)}%`;
+    indicatorBody.style.left = `${((from.value - this.min) / (this.max - this.min)) * 100}%`;
+    indicatorBody.style.right = `${100 - (((to.value - this.min) / (this.max - this.min)) * 100)}%`;
   }
 
-  showValueInterval() {
-    const { rangeMin, rangeMax, rangeSliderFrom, rangeSliderTo, slider } = this.HTMLElement;
+  showValueIndicatorValue() {
+    const { indicatorMin, indicatorMax, from, to, slider } = this.HTMLElement;
 
     slider.addEventListener('input', () => {
-      rangeSliderFrom.value = this.from = rangeMin.value;
-      rangeSliderTo.value = this.to = rangeMax.value;
+      from.value = this.from = indicatorMin.value;
+      to.value = this.to = indicatorMax.value;
     })
   }
 

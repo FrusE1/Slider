@@ -39,7 +39,7 @@ body {
   position: relative;
 }
 
-.range-slider__progress {
+.range-slider__indicator {
   position: absolute;
   right: 25%;
   left: 25%;
