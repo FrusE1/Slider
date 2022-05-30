@@ -110,25 +110,16 @@ class Slider {
 
   setValue() {
     const { min, max, step, from, to } = this.HTMLElements;
+
     const dataElements = document.querySelectorAll('[data-slider]');
 
     for (let element of dataElements) {
       element.min = this.min = min.value;
       element.max = this.max = max.value;
+
       if (element.type === 'range') {
+        console.log(element.value);
         element.step = this.step = step.value;
-      }
-      if (element.dataset.interval === "from") {
-        element.value = this.from = from.value;
-      }
-      if (element.dataset.interval === "to") {
-        element.value = this.to = to.value;
-      }
-      if (element.dataset.slider === "plus") {
-        element.value = this.to = to.value;
-      }
-      if (element.dataset.slider === "minus") {
-        element.value = this.from = from.value;
       }
     }
   }
@@ -183,6 +174,7 @@ class Slider {
       min.value = Math.abs(max.value) - step.value;
     }
     min.value = Math.round(min.value);
+    this.min = min.value;
   }
 
   maxValue() {
@@ -191,6 +183,7 @@ class Slider {
       max.value = +min.value + +step.value;
     }
     max.value = Math.round(max.value);
+    this.max = max.value;
   }
 
   indicatorValue() {
@@ -201,8 +194,11 @@ class Slider {
 
   stepValue() {
     const { step, min, max } = this.HTMLElements;
-    if (+step.value >= ((max.value - min.value) / 2)) {
-      step.value = (max.value - min.value) / 2;
+
+    const maxStepValue = ((max.value - min.value) / 2);
+
+    if (+step.value >= maxStepValue) {
+      step.value = maxStepValue;
     }
   }
 
@@ -218,6 +214,7 @@ class Slider {
       to.value = +min.value + +step.value;
     }
     to.value = Math.round(to.value);
+    this.to = to.value;
   }
 
   fromValue() {
@@ -248,6 +245,7 @@ class Slider {
     }
 
     from.value = indicatorMin.value;
+    this.from = from.value;
   }
 
   gapIndicatorMax() {
@@ -264,6 +262,7 @@ class Slider {
     }
 
     to.value = indicatorMax.value;
+    this.to = to.value;
   }
 }
 
