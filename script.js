@@ -169,20 +169,24 @@ class Slider {
 
   minValue() {
     const { min, max, step } = this.sliderElements;
-    if (+min.value > (Math.abs(max.value) - step.value)) {
-      min.value = Math.abs(max.value) - step.value;
+
+    const difMaxAndStep = Math.abs(max.value) - this.step
+
+    if (+min.value >= difMaxAndStep) {
+      min.value = difMaxAndStep;
     }
     min.value = Math.round(min.value);
-    this.min = min.value;
   }
 
   maxValue() {
     const { min, max, step } = this.sliderElements;
-    if (max.value < (+min.value + +step.value)) {
-      max.value = +min.value + +step.value;
+
+    const difMinAndStep = +min.value + +this.step;
+
+    if (max.value <= difMinAndStep) {
+      max.value = difMinAndStep;
     }
     max.value = Math.round(max.value);
-    this.max = max.value;
   }
 
   indicatorValue() {
@@ -194,11 +198,13 @@ class Slider {
   stepValue() {
     const { step, min, max } = this.sliderElements;
 
-    const maxStepValue = ((max.value - min.value) / 2);
+    const maxStep = ((max.value - min.value) / 2);
 
-    if (+step.value >= maxStepValue) {
-      step.value = maxStepValue;
+    if (+step.value >= maxStep) {
+      step.value = maxStep;
     }
+
+    step.value = Math.abs(step.value);
   }
 
   fromValue() {
@@ -221,7 +227,6 @@ class Slider {
       to.value = +from.value + +step.value;
     }
     to.value = Math.round(to.value);
-    this.to = to.value;
   }
 
   gapIndicatorMin() {
@@ -238,7 +243,6 @@ class Slider {
     }
 
     from.value = indicatorMin.value;
-    this.from = from.value;
   }
 
   gapIndicatorMax() {
@@ -255,7 +259,6 @@ class Slider {
     }
 
     to.value = indicatorMax.value;
-    this.to = to.value;
   }
 }
 
