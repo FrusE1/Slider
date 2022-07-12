@@ -9,8 +9,6 @@ function getTemplateSlider(args) {
       <input type="range" data-type="range" data-slider="minus" min="${min}" max="${max}" value="${from}" step="${step}">
       <input type="range" data-type="range" data-slider="plus" min="${min}" max="${max}" value="${to}" step="${step}">
     </div>
-    <div class="range-slider__tip tip-from tip-active"><span>10</span></div>
-    <div class="range-slider__tip tip-to tip-active"><span>10</span></div>
   </div>
   <div class="slider__panel slider-panel">
     <div class="slider-panel__step slider-panel__elem">
@@ -79,8 +77,6 @@ class Slider {
       max: document.querySelector('[data-slider="max"]'),
       from: document.querySelector('[data-slider="from"]'),
       to: document.querySelector('[data-slider="to"]'),
-      tipFrom: document.querySelector('.tip-from'),
-      tipTo: document.querySelector('.tip-to'),
     }
   }
 
@@ -94,7 +90,6 @@ class Slider {
       indicator: this.setIndicatorValue.bind(this),
       gapMin: this.calcGapIndicatorMin.bind(this),
       gapMax: this.calcGapIndicatorMax.bind(this),
-      tip: this.setTipValue.bind(this),
     }
   }
 
@@ -114,14 +109,11 @@ class Slider {
   }
 
   handleIndicatorPosition() {
-    const { slider, indicatorMin, indicatorMax, from, to, tipFrom, tipTo } = this.sliderElements;
+    const { slider, indicatorMin, indicatorMax, from, to } = this.sliderElements;
 
     slider.addEventListener('input', (event) => {
       from.value = this.from = indicatorMin.value;
       to.value = this.to = indicatorMax.value;
-      console.log(this.from);
-      tipFrom.querySelector('span').textContent = from.value;
-      tipTo.querySelector('span').textContent = to.value;
       if (event.target.dataset.slider === "minus") {
         this.calcGapIndicatorMin.bind(this)();
       }
@@ -144,12 +136,10 @@ class Slider {
   }
 
   calcIndicatorPosition() {
-    const { indicatorBody, indicatorMin, indicatorMax, tipFrom, tipTo } = this.sliderElements;
+    const { indicatorBody, indicatorMin, indicatorMax } = this.sliderElements;
 
     indicatorBody.style.left = `${((indicatorMin.value - this.min) / (this.max - this.min)) * 100}%`;
     indicatorBody.style.right = `${100 - (((indicatorMax.value - this.min) / (this.max - this.min)) * 100)}%`;
-    tipFrom.style.left = `${((indicatorMin.value - this.min) / (this.max - this.min)) * 96.8}%`;
-    tipTo.style.left = `${((indicatorMax.value - this.min) / (this.max - this.min)) * 96.8}%`;
   }
 
   defaultValue() {
@@ -223,12 +213,6 @@ class Slider {
       to.value = +from.value + +step.value;
     }
     to.value = Math.round(to.value);
-  }
-
-  setTipValue() {
-    const { indicatorMin, indicatorMax, tipFrom, tipTo } = this.sliderElements;
-    tipFrom.querySelector('span').textContent = indicatorMin.value;
-    tipTo.querySelector('span').textContent = indicatorMax.value;
   }
 
   calcGapIndicatorMin() {
